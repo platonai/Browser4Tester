@@ -2,9 +2,10 @@ package com.browser4tester.healer
 
 import org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 import org.junit.platform.launcher.Launcher
-import org.junit.platform.launcher.LauncherDiscoveryRequestBuilder
+import org.junit.platform.launcher.LauncherDiscoveryRequest
 import org.junit.platform.launcher.TestExecutionListener
 import org.junit.platform.launcher.TestIdentifier
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder
 import org.junit.platform.launcher.core.LauncherFactory
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -30,7 +31,7 @@ class ClassExecutor(private val launcher: Launcher = LauncherFactory.create()) {
 
     fun execute(className: String): ClassExecutionResult {
         val collector = FailureCollector()
-        val request = LauncherDiscoveryRequestBuilder.request()
+        val request = org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder.request()
             .selectors(selectClass(className))
             .build()
 
