@@ -17,25 +17,56 @@ mvn clean package -DskipTests
 ```
 
 ### 运行示例
-```bash
-# 测试单个类
-./bin/run-healer.sh /path/to/target-project com.example.MyTest
 
-# 实际示例（已验证）
-./bin/run-healer.sh ~/workspace/Browser4-4.6/pulsar-core/pulsar-dom \
-    ai.platon.pulsar.dom.select.TestQueryParser
+```bash
+# 自动模式：测试整个项目（推荐）
+./bin/run-healer.sh /path/to/target-project
+
+# 自动模式：测试单个模块
+./bin/run-healer.sh ~/workspace/Browser4-4.6/pulsar-core/pulsar-dom
+
+# 手动模式：测试指定类
+./bin/run-healer.sh /path/to/project com.example.MyTest
+
+# 实际示例（已验证 - 自动模式）
+./bin/run-healer.sh ~/workspace/Browser4-4.6
 ```
 
 ### 预期输出
+
+**自动模式**：
 ```
 === Self-Healing Test Orchestrator ===
 Target Project: /path/to/project
-Test Classes: com.example.MyTest
 
+🤖 Mode: Auto (discovering all modules and tests)
+
+🔍 Discovering modules in dependency order...
+✓ Found 3 module(s)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Processing Module 1 of 3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 Module: common
+🔍 Discovering test classes...
+✓ Found 5 test class(es)
+  🧪 Testing 5 classes...
+     ✅ All tests passed
+
+[... more modules ...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎉 All modules processed!
+Total: 3 modules | Passed: 3 | Failed: 0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**手动模式**：
+```
 ✅ All classes passed.
 ```
 
-或
+或失败时：
 
 ```
 ⚠️ Unstable classes:
@@ -44,7 +75,18 @@ Test Classes: com.example.MyTest
 
 ## 工作原理
 
-1. **执行** → 运行测试类
+### 自动模式
+1. **发现** → 使用 Maven reactor 查找所有模块
+2. **排序** → 按依赖顺序处理模块
+3. **编译** → 编译每个模块的测试代码
+4. **查找** → 在 src/test/ 下找所有测试类
+5. **执行** → 批量运行模块的所有测试
+6. **修复** → 失败时调用 Copilot AI
+7. **验证** → 检查完整性并重试
+8. **报告** → 汇总所有模块结果
+
+### 手动模式
+1. **执行** → 运行指定的测试类
 2. **失败** → 收集错误详情
 3. **修复** → 调用 Copilot AI
 4. **验证** → 检查完整性
@@ -64,9 +106,11 @@ gh copilot -- -p "test"
 
 ### Q: 找不到测试类
 确保：
-- 类名是完全限定名（FQDN）
+- 使用自动模式：`./bin/run-healer.sh /path/to/project`（无需指定类名）
+- 或手动模式：类名是完全限定名（FQDN）
 - 目标项目已编译（`mvn compile test-compile`）
-- 测试文件位于标准位置（`src/test/kotlin/`）
+- 测试文件位于标准位置（`src/test/kotlin/` 或 `src/test/java/`）
+- 文件名包含 "Test"（如 `MyTest.kt`）
 
 ### Q: 修复后仍然失败
 - 检查 `config.maxRetryPerClass`（默认 3）
@@ -107,6 +151,7 @@ OrchestratorConfig(
 ## 下一步
 
 - 查看 [README.md](README.md) 了解完整文档
+- 查看 [docs-dev/AUTO_DISCOVERY.md](docs-dev/AUTO_DISCOVERY.md) 了解自动发现详情
 - 查看 [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md) 了解技术细节
 - 查看 [browser4-test-healer/src](browser4-test-healer/src) 了解源码
 
@@ -120,5 +165,6 @@ OrchestratorConfig(
 ---
 
 **Created**: 2026-02-15  
-**Tested on**: Browser4-4.6/pulsar-core/pulsar-dom  
+**Updated**: 2026-02-16  
+**Tested on**: Browser4-4.6 (11+ modules, auto-discovery mode)  
 **Status**: ✅ Working

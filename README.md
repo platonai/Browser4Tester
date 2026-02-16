@@ -8,12 +8,15 @@ Browser4Tester implements a class-level self-healing test orchestrator for Kotli
 
 ## Features
 
+✅ **Auto-Discovery Mode** - Automatically find all modules and tests  
+✅ **Dependency-Ordered Execution** - Use Maven reactor for correct module order  
 ✅ **Class-Level Isolation** - Each test class executes independently  
 ✅ **Intelligent Failure Detection** - Captures method-level failures with full stack traces  
 ✅ **AI-Powered Repair** - Leverages GitHub Copilot CLI for automatic fixes  
 ✅ **Integrity Protection** - Prevents weakening tests (e.g., removing assertions)  
 ✅ **Git Safety** - Automatic rollback if repairs fail  
-✅ **Retry Logic** - Configurable retry attempts per class (default: 3)
+✅ **Retry Logic** - Configurable retry attempts per class (default: 3)  
+✅ **Batch Processing** - Process all tests in a module together for efficiency
 
 ## Quick Start
 
@@ -31,22 +34,43 @@ mvn clean package -DskipTests
 
 ### Usage
 
+#### Auto Mode (Recommended)
+
+Automatically discover and test all modules and test classes:
+
 ```bash
-# Basic usage
-./bin/run-healer.sh <target-project-path> <test-class-fqn>
+# Test entire project
+./bin/run-healer.sh /path/to/project
 
-# Example: Test a single class
-./bin/run-healer.sh /path/to/project com.example.MyTest
+# Test single module
+./bin/run-healer.sh /path/to/project/specific-module
+```
 
-# Example: Test multiple classes
+The script will:
+- 🔍 Discover all modules in dependency order (using Maven reactor)
+- 📦 Process each module sequentially
+- 🧪 Find all test classes in each module
+- 🤖 Run self-healing tests on all discovered classes
+- 📊 Generate summary report
+
+#### Manual Mode
+
+Test specific classes:
+
+```bash
 ./bin/run-healer.sh /path/to/project com.example.Test1 com.example.Test2
 ```
 
 ### Tested On
 
-✅ Successfully tested on `Browser4-4.6/pulsar-core/pulsar-dom` project
-- Test class: `ai.platon.pulsar.dom.select.TestQueryParser`
-- Status: All tests passed
+✅ Successfully tested on `Browser4-4.6` project
+- Multi-module Maven project with 11+ modules
+- Automatic module discovery in dependency order
+- Batch testing of all modules and test classes
+- Module: `pulsar-core/pulsar-dom` - 2 test classes
+- Module: `pulsar-core/pulsar-browser` - 14 test classes
+- Module: `pulsar-core/pulsar-common` - 3 test classes
+- Status: Auto-discovery working correctly
 
 ## Architecture
 
@@ -94,9 +118,54 @@ OrchestratorConfig(
 
 ## Output Format
 
+### Auto Mode
 ```
 === Self-Healing Test Orchestrator ===
 Target Project: /path/to/project
+
+🤖 Mode: Auto (discovering all modules and tests)
+
+🔍 Discovering modules in dependency order...
+✓ Found 5 module(s)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Processing Module 1 of 5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 Module: common
+   Path: /path/to/project/common
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔨 Compiling module...
+🔍 Discovering test classes...
+✓ Found 10 test class(es)
+
+  🧪 Testing 10 classes...
+     ✅ All tests passed
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Module Summary: common
+✅ All tests passed
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[... more modules ...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎉 All modules processed!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total: 5 modules
+Passed: 4 modules
+Failed: 1 modules
+
+Failed modules:
+  - api-module
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Manual Mode
+```
+=== Self-Healing Test Orchestrator ===
+Target Project: /path/to/project
+
+🎯 Mode: Manual (specific test classes)
 Test Classes: com.example.MyTest
 
 All classes passed.
