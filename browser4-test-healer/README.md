@@ -305,6 +305,7 @@ val flakyTests = graph.modules
 
 - **[DESIGN.md](../DESIGN.md)** - Complete architecture and design decisions
 - **[USAGE_GUIDE.md](USAGE_GUIDE.md)** - Detailed usage examples and API reference
+- **[EXAMPLES.md](EXAMPLES.md)** - Real-world examples and data queries
 - **[IMPLEMENTATION_NOTES.md](../IMPLEMENTATION_NOTES.md)** - Implementation challenges and solutions
 
 ## Limitations
